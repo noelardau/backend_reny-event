@@ -34,6 +34,14 @@ func (service EvenementService) GetAllReservationsFor(evenement_id uuid.UUID)([]
 }
 
 
+func (serrvice EvenementService) ValidateReservation(id_Evenement uuid.UUID) error {
+    if err := serrvice.repo.ValidateReservation(id_Evenement); err != nil {
+        return err
+    }
+    return  nil
+}
+
+
 func mapRequeteReservation(r *http.Request) (models.ReservationRequest, error) {
     var req models.ReservationRequest
     

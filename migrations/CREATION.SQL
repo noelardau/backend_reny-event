@@ -1221,3 +1221,79 @@ FROM reservations_details rd1
 GROUP BY 
     evenement_id, evenement_titre,
     reservation_id, email, etat_reservation;
+
+
+    -- ================================================
+-- FONCTION : obtenir_details_reservation_par_id
+-- ================================================
+CREATE OR REPLACE FUNCTION obtenir_details_reservation_par_id(p_reservation_id UUID)
+RETURNS JSONB AS $$
+DECLARE
+    result JSONB;
+BEGIN
+    WITH reservation_details AS (
+        SELECT 
+            -- Informations de la réservation
+            r.id AS reservation_id,
+            r.email,
+            r.date_reservation,
+            r.etat AS etat_reservation,
+            
+            -- Informations de l'événement
+            e.titre AS evenement_nom,
+            l.nom AS lieu_nom,
+            e.date_debut,
+            e.date_fin,
+            
+            -- Agrégation des places et prix
+            COUNT(p.id) AS nombre_places,
+            ARRAY_AGG(p.numero ORDER BY p.numero) AS numeros_places,
+            ARRAY_AGG(DISTINCT t.prix) AS prix_places,
+            SUM(t.prix) AS total_reservation
+            
+        FROM reservation r
+        JOIN reservation_place rp ON r.id = rp.reservation_id
+        JOIN place p ON rp.place_id = p.id
+        JOIN tarif t ON p.tarif_id = t.id
+        JOIN evenement e ON t.evenement_id = e.id
+        JOIN lieu l ON e.lieu_id = l.id
+        
+        WHERE r.id = p_reservation_id
+        GROUP BY 
+            r.id, r.email, r.date_reservation, r.etat,
+            e.titre, l.nom, e.date_debut, e.date_fin
+    )
+    SELECT 
+        jsonb_build_object(
+            'reservation_id', rd.reservation_id,
+            'email', rd.email,
+            'date_reservation', rd.date_reservation,
+            'etat_reservation', rd.etat_reservation,
+            'evenement', jsonb_build_object(
+                'nom', rd.evenement_nom,
+                'lieu', rd.lieu_nom,
+                'date_debut', rd.date_debut,
+                'date_fin', rd.date_fin
+            ),
+            'details_places', jsonb_build_object(
+                'nombre_places', rd.nombre_places,
+                'numeros_places', rd.numeros_places,
+                'prix_par_place', rd.prix_places,
+                'total_reservation', rd.total_reservation
+            )
+        )
+    INTO result
+    FROM reservation_details rd;
+    
+    -- Si aucune réservation trouvée
+    IF result IS NULL THEN
+        result := jsonb_build_object(
+            'erreur', true,
+            'message', 'Réservation non trouvée',
+            'reservation_id', p_reservation_id
+        );
+    END IF;
+    
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;

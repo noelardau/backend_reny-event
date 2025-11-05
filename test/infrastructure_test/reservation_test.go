@@ -61,3 +61,16 @@ func TestGetReservation(t *testing.T) {
 		}
 	})
 }
+
+func TestValidateReservation(t *testing.T) {
+	t.Run("Validation with success", func (t *testing.T) {
+		repo := CreateRepository(t)
+		id_Evenement := uuid.MustParse("b5c20410-aeed-4403-85be-13c4a2263f2e")
+		err := repo.ValidateReservation(id_Evenement)
+		if err != nil {
+			t.Errorf("Failed to validate reservation : %v", err)
+		}
+	})
+}
+
+

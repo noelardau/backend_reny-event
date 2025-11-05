@@ -26,6 +26,7 @@ func SetupRoutes(r chi.Router, evenementService interfaces.EvenementService) {
 		r.Post("/evenements", handler.CreationEvenementHandler(evenementService)) 
 		r.Post("/reservations", handler.ReserverHandler(evenementService)) 
 		r.Get("/evenements/reservations/{id}", handler.AllReservationsHandler(evenementService)) 
+		r.Post("/reservations/validate/{id}", handler.ValiderReservation(evenementService))
 	})
 
 	// Route de santé

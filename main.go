@@ -16,10 +16,12 @@ func main() {
 	r := chi.NewRouter()
 
 	// Initialiser les services (pour l'instant vides)
-	conn, err := db.CreateNewPgxConnexion()
+	conn, err := db.CreateNewPgxConnexionPool()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
+
 	evenementRepositorry := repository.NewEvenementRepository(conn)
 	evenementService := service.NewEvenementService(evenementRepositorry)
 	// authService := &service.AuthentificationService{}
@@ -30,14 +32,9 @@ func main() {
 
 	// Démarrer le serveur
 	port := ":3000"
-	log.Printf("Serveur démarré sur http://localhost%s", port)
-	log.Printf("Endpoint création événement: POST http://localhost%s/v1/evenements", port)
-	
+	log.Printf(port)
+
 	if err := http.ListenAndServe(port, r); err != nil {
 		log.Fatalf("Erreur du serveur: %v", err)
 	}
 }
-
-
-
-

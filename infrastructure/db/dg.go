@@ -2,15 +2,15 @@ package db
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+func CreateNewPgxConnexionPool() (*pgxpool.Pool, error) {
 
-func CreateNewPgxConnexion() (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), 	"postgresql://postgres:BoissonXXLenergy261001..@localhost:5432/reny_event")
+	dbpool, err := pgxpool.New(context.Background(), "postgresql://postgres:BoissonXXLenergy261001..@localhost:5432/reny_event")
 	if err != nil {
 		return nil, err
 	}
 
-	return conn, nil
+	return dbpool, nil
 }

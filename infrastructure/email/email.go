@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
-
 	"github.com/J2d6/reny_event/domain/models"
 	"gopkg.in/gomail.v2"
 )
@@ -26,7 +25,7 @@ func SendGomail(reservationInfos models.ReservationDetails)  {
 	t.Execute(&body,reservationInfos)
 
 	CreateQR()
-	fmt.Println("CREATE QR")
+	// fmt.Println("CREATE QR")
 	m := gomail.NewMessage()
 	m.SetHeader("From", "j2d6.pro@gamil.com")
 	m.SetHeader("To",reservationInfos.Email)

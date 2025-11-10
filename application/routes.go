@@ -9,14 +9,14 @@ import (
 )
 
 func SetupRoutes(r chi.Router, evenementService interfaces.EvenementService, authService *service.AuthentificationService) {
-	
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
-		MaxAge:           86400, 
+		MaxAge:           86400,
 	}))
 
 	// Route d'authentification (publique)
@@ -25,14 +25,14 @@ func SetupRoutes(r chi.Router, evenementService interfaces.EvenementService, aut
 	r.Route("/v1", func(r chi.Router) {
 		// Routes publiques
 		r.Get("/evenements/{id}", handler.GetEvenementByIDHandler(evenementService))
-		r.Get("/evenements/reservations/{id}", handler.AllReservationsHandler(evenementService)) 
-		r.Post("/reservations", handler.ReserverHandler(evenementService)) 
+		r.Get("/evenements/reservations/{id}", handler.AllReservationsHandler(evenementService))
+		r.Post("/reservations", handler.ReserverHandler(evenementService))
 
 		// Routes protégées (nécessitent une authentification)
-		r.Group(func(r chi.Router) {
-			r.Use(handler.AuthMiddleware) // Applique le middleware d'auth à toutes les routes de ce groupe		
-			r.Post("/evenements", handler.CreationEvenementHandler(evenementService)) 
-			r.Post("/reservations/validate/{id}", handler.ValiderReservation(evenementService))
-		})
+		// r.Group(func(r chi.Router) {
+		// r.Use(handler.AuthMiddleware) // Applique le middleware d'auth à toutes les routes de ce groupe
+		r.Post("/evenements", handler.CreationEvenementHandler(evenementService))
+		r.Post("/reservations/validate/{id}", handler.ValiderReservation(evenementService))
+		// })
 	})
 }

@@ -7,7 +7,7 @@ import (
 
 func CreateNewPgxConnexionPool() (*pgxpool.Pool, error) {
 
-	dbpool, err := pgxpool.New(context.Background(), "postgresql://postgres:BoissonXXLenergy261001..@localhost:5432/reny_event")
+	dbpool, err := pgxpool.New(context.Background(), "postgresql://postgres:gF7dYGWDK9tOUzCN@db.bbfsckuzadzzsdymgzmj.supabase.co:5432/postgres")
 	if err != nil {
 		return nil, err
 	}
